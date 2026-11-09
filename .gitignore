@@ -1,0 +1,5 @@
+target/
+.idea/
+nbproject/private/
+*.class
+.env
