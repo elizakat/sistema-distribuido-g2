@@ -7,6 +7,9 @@ import com.mycompany.app_distribuidas.negocio.FacturaService;
 import com.mycompany.app_distribuidas.negocio.ReportesService;
 import com.mycompany.app_distribuidas.negocio.UsuariosService;
 
+// Importamos servicio de Bancos para que el Router lo reconozca
+import com.mycompany.app_distribuidas.negocio.BancosService;
+
 /** Traduce las acciones SADP/1 a los servicios de negocio correspondientes. */
 public class Router {
 
@@ -14,6 +17,9 @@ public class Router {
     private final UsuariosService usuarios = new UsuariosService();
     private final FacturaService facturas = new FacturaService();
     private final ReportesService reportes = new ReportesService();
+
+    // Instanciamos el servicio para poder redirigir las peticiones
+    private final BancosService bancos = new BancosService();
 
     public Object ejecutar(String action, JsonObject payload) throws Exception {
         String[] partes = action.split("\\.");
@@ -31,6 +37,12 @@ public class Router {
             case "facturacion.ciudad" -> catalogos.ejecutar("ciudad", operacion, payload);
             case "facturacion.factura" -> facturas.ejecutar(operacion, payload);
             case "facturacion.reporte" -> reportes.ejecutar(operacion, payload);
+
+            // Enrutamos las peticiones del módulo de Bancos
+            case "bancos.cuenta" -> bancos.ejecutar("cuenta", operacion, payload);
+            case "bancos.transaccion" -> bancos.ejecutar("transaccion", operacion, payload);
+            case "bancos.tipotransaccion" -> bancos.ejecutar("tipotransaccion", operacion, payload);
+            case "bancos.reporte" -> bancos.ejecutar("reporte", operacion, payload);
             default -> throw new AppException("UNKNOWN_ACTION", "Acción desconocida: " + action);
         };
     }

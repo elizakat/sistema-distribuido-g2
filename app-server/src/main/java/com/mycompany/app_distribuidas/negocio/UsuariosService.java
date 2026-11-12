@@ -10,7 +10,7 @@ public class UsuariosService {
         x.addProperty("idUsuario",r.getInt("ID_USUARIO"));
         x.addProperty("username",r.getString("USERNAME"));
         x.addProperty("estado",r.getString("ESTADO"));
-        x.addProperty("tipoUsuario",r.getString("TIPO_USUARIO"));
+        x.addProperty("tipoUsuario", "ADMIN");
         return x;
     }
     public Object ejecutar(String op,JsonObject p)throws SQLException{

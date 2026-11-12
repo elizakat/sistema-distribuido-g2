@@ -268,6 +268,20 @@ public class FrmMenuPrincipal extends javax.swing.JFrame {
     private void conectarMenuFacturacion() {
         jMenuItem6.addActionListener(evento -> new FrmCliente().setVisible(true));
         jMenuItem7.addActionListener(evento -> new FrmCiudadEntrega().setVisible(true));
+        
+        // Conectar pantalla de Cuentas Bancarias
+        jMenuItem13.addActionListener(evento -> new FrmCuentaBancaria().setVisible(true));
+        
+        // Conectar pantalla de Tipo Transaccion
+        jMenuItem12.addActionListener(evento -> new FrmTipoTransaccion().setVisible(true));
+        
+        // Conectar pantalla de Transacciones Bancarias
+        jMenuItem14.addActionListener(evento -> new FrmTransaccion().setVisible(true));
+
+        // Agregar opcion de Reportes de Bancos en el menu de Bancos
+        javax.swing.JMenuItem reportesBancos = new javax.swing.JMenuItem("Reportes de bancos");
+        reportesBancos.addActionListener(evento -> new FrmReporteBancos().setVisible(true));
+        jMenu5.add(reportesBancos);
 
         javax.swing.JMenuItem reportes = new javax.swing.JMenuItem("Reportes de facturación");
         reportes.addActionListener(evento -> new FrmReporteFacturacion().setVisible(true));
