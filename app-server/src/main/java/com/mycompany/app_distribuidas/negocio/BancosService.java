@@ -15,7 +15,6 @@ import java.util.List;
 public class BancosService {
 
     private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
-    private static final Gson gsonEntrada = new Gson();
 
     // Recibe el JSON del Router, lo convierte a objetos Java y llama al metodo correcto
     public Object ejecutar(String recurso, String operacion, JsonObject payload) throws AppException {
@@ -68,8 +67,8 @@ public class BancosService {
             // Enrutamiento para transacciones complejas de cabecera y detalle
             else if (recurso.equals("transaccion")) {
                 if (operacion.equals("insertar")) {
-                    CabeceraTransaccion cabecera = gsonEntrada.fromJson(payload.get("cabecera"), CabeceraTransaccion.class);
-                    List<DetalleTransaccion> detalles = gsonEntrada.fromJson(payload.get("detalles"), new TypeToken<List<DetalleTransaccion>>(){}.getType());
+                    CabeceraTransaccion cabecera = gson.fromJson(payload.get("cabecera"), CabeceraTransaccion.class);
+                    List<DetalleTransaccion> detalles = gson.fromJson(payload.get("detalles"), new TypeToken<List<DetalleTransaccion>>(){}.getType());
                     procesarTransaccion(cabecera, detalles);
                     return "Transacción procesada correctamente";
                 } else if (operacion.equals("listar")) {
@@ -82,8 +81,8 @@ public class BancosService {
                     respuesta.add("items", gson.toJsonTree(BancosDAO.listarDetallesPorCabecera(idTrans)));
                     return respuesta;
                 } else if (operacion.equals("actualizar")) {
-                    CabeceraTransaccion cabecera = gsonEntrada.fromJson(payload.get("cabecera"), CabeceraTransaccion.class);
-                    List<DetalleTransaccion> detalles = gsonEntrada.fromJson(payload.get("detalles"), new TypeToken<List<DetalleTransaccion>>(){}.getType());
+                    CabeceraTransaccion cabecera = gson.fromJson(payload.get("cabecera"), CabeceraTransaccion.class);
+                    List<DetalleTransaccion> detalles = gson.fromJson(payload.get("detalles"), new TypeToken<List<DetalleTransaccion>>(){}.getType());
                     BancosDAO.actualizarTransaccionCompleta(cabecera, detalles);
                     return "Transacción actualizada correctamente";
                 } else if (operacion.equals("eliminar")) {
