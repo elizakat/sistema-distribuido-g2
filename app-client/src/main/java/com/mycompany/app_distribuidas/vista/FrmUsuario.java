@@ -13,11 +13,13 @@ import javax.swing.table.DefaultTableModel;
 
 
 
+
 /**
  *
  * @author ASUSPC
  */
 public class FrmUsuario extends javax.swing.JFrame {
+    private Usuario usuarioLogueado;
     
     
     
@@ -33,6 +35,19 @@ public class FrmUsuario extends javax.swing.JFrame {
     cargarUsuarios();
     setExtendedState(MAXIMIZED_BOTH);
     }
+    
+    public FrmUsuario(
+        Usuario usuarioLogueado) {
+
+    initComponents();
+
+    this.usuarioLogueado =
+            usuarioLogueado;
+
+    cargarUsuarios();
+
+    setExtendedState(MAXIMIZED_BOTH);
+}
     
     
     private void limpiarCampos() {
@@ -648,7 +663,9 @@ if (txtIdUsuario.getText().isEmpty()) {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
     FrmMenuPrincipal menu =
-        new FrmMenuPrincipal();
+        new FrmMenuPrincipal(
+                usuarioLogueado
+        );
 
 menu.setVisible(true);
 

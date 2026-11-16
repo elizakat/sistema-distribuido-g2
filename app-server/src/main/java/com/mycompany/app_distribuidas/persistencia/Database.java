@@ -10,7 +10,7 @@ public final class Database {
     }
     public static long next(Connection c,String sequence)throws SQLException{
         try(PreparedStatement ps=c.prepareStatement("SELECT "+switch(sequence){
-            case "SEQ_CLIENTE","SEQ_CIUDAD","SEQ_FACTURA","SEQ_DETALLE_FAC","SEQ_MOVIMIENTO","SEQ_DETALLE_MOV","SEQ_ARTICULO","SEQ_USUARIO"->sequence;
+            case "SEQ_CLIENTE","SEQ_CIUDAD","SEQ_FACTURA","SEQ_DETALLE_FAC","SEQ_MOVIMIENTO","SEQ_TIPO_MOV","SEQ_DETALLE_MOV","SEQ_ARTICULO","SEQ_USUARIO"->sequence;
             default->throw new IllegalArgumentException("Secuencia inválida");
         }+".NEXTVAL FROM DUAL");
         ResultSet r=ps.executeQuery()){

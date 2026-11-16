@@ -7,6 +7,7 @@ import com.mycompany.app_distribuidas.vista.FrmUsuario;
 import com.mycompany.app_distribuidas.modelo.Usuario;
 import javax.swing.JOptionPane;
 import com.mycompany.app_distribuidas.vista.FrmArticulo;
+import com.mycompany.app_distribuidas.vista.FrmTipoMovimiento;
 /**
  *
  * @author ASUSPC
@@ -134,10 +135,26 @@ public class FrmMenuPrincipal extends javax.swing.JFrame {
 
         jMenuItem4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jMenuItem4.setText("Tipo Movimiento");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
         jMenu2.add(jMenuItem4);
 
         jMenuItem5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jMenuItem5.setText("Movimiento Inventario");
+        jMenuItem5.addActionListener(
+    new java.awt.event.ActionListener() {
+
+        public void actionPerformed(
+                java.awt.event.ActionEvent evt) {
+
+            jMenuItem5ActionPerformed(evt);
+        }
+    }
+);
+ 
         jMenu2.add(jMenuItem5);
 
         jMenuBar1.add(jMenu2);
@@ -280,9 +297,14 @@ public class FrmMenuPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem8ActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        FrmUsuario frm = new FrmUsuario();
+        FrmUsuario frm =
+        new FrmUsuario(
+                usuarioLogueado
+        );
 
-        frm.setVisible(true);
+frm.setVisible(true);
+
+this.dispose();
         
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
@@ -327,16 +349,37 @@ if (opcion ==
     }//GEN-LAST:event_jMenuItemCerrarSesionActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-     FrmArticulo frm =
-        new FrmArticulo();
+    FrmArticulo frm =
+            new FrmArticulo(
+                    usuarioLogueado
+            );
 
-     frm.setVisible(true);
+    frm.setVisible(true);
 
-     this.dispose();
-        
-        
+    this.dispose();
+         
+      
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+       
+    FrmTipoMovimiento frm =
+            new FrmTipoMovimiento();
+
+    frm.setVisible(true);
+
+    this.dispose();
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
+private void jMenuItem5ActionPerformed(
+        java.awt.event.ActionEvent evt) {
+
+    FrmMovimientoInventario frm =
+            new FrmMovimientoInventario();
+
+    frm.setVisible(true);
+
+    this.dispose();
+}
     /**
      * @param args the command line arguments
      */
