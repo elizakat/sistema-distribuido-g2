@@ -6,9 +6,8 @@ import com.mycompany.app_distribuidas.negocio.CatalogosService;
 import com.mycompany.app_distribuidas.negocio.FacturaService;
 import com.mycompany.app_distribuidas.negocio.ReportesService;
 import com.mycompany.app_distribuidas.negocio.UsuariosService;
-
-// Importamos servicio de Bancos para que el Router lo reconozca
 import com.mycompany.app_distribuidas.negocio.BancosService;
+import com.mycompany.app_distribuidas.negocio.MovimientoInventarioService;
 
 /** Traduce las acciones SADP/1 a los servicios de negocio correspondientes. */
 public class Router {
@@ -17,28 +16,26 @@ public class Router {
     private final UsuariosService usuarios = new UsuariosService();
     private final FacturaService facturas = new FacturaService();
     private final ReportesService reportes = new ReportesService();
-
-    // Instanciamos el servicio para poder redirigir las peticiones
     private final BancosService bancos = new BancosService();
+    private final MovimientoInventarioService movimientos = new MovimientoInventarioService();
 
     public Object ejecutar(String action, JsonObject payload) throws Exception {
         String[] partes = action.split("\\.");
         if (partes.length != 3) {
-            throw new AppException("UNKNOWN_ACTION", "Formato esperado modulo.recurso.operacion");
+            throw new AppException("BAD_REQUEST", "Formato de acción inválido: " + action);
         }
-
         String recurso = partes[0] + "." + partes[1];
         String operacion = partes[2];
 
         return switch (recurso) {
             case "seguridad.usuario" -> usuarios.ejecutar(operacion, payload);
             case "inventario.articulo" -> catalogos.ejecutar("articulo", operacion, payload);
+            case "inventario.movimiento" -> movimientos.ejecutar(operacion, payload);
+            case "inventario.tipoMovimiento" -> catalogos.ejecutar("tipoMovimiento", operacion, payload);
             case "facturacion.cliente" -> catalogos.ejecutar("cliente", operacion, payload);
             case "facturacion.ciudad" -> catalogos.ejecutar("ciudad", operacion, payload);
             case "facturacion.factura" -> facturas.ejecutar(operacion, payload);
             case "facturacion.reporte" -> reportes.ejecutar(operacion, payload);
-
-            // Enrutamos las peticiones del módulo de Bancos
             case "bancos.cuenta" -> bancos.ejecutar("cuenta", operacion, payload);
             case "bancos.transaccion" -> bancos.ejecutar("transaccion", operacion, payload);
             case "bancos.tipotransaccion" -> bancos.ejecutar("tipotransaccion", operacion, payload);

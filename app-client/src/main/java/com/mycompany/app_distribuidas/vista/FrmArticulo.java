@@ -8,12 +8,14 @@ import com.mycompany.app_distribuidas.modelo.Articulo;
 import javax.swing.JOptionPane;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
+import com.mycompany.app_distribuidas.modelo.Usuario;
+
 /**
  *
  * @author ASUSPC
  */
 public class FrmArticulo extends javax.swing.JFrame {
-    
+    private Usuario usuarioLogueado;
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmArticulo.class.getName());
 
     /**
@@ -23,6 +25,19 @@ public class FrmArticulo extends javax.swing.JFrame {
         initComponents();
         setExtendedState(MAXIMIZED_BOTH);
         cargarArticulos();
+        }
+        public FrmArticulo(
+        Usuario usuarioLogueado) {
+
+    initComponents();
+
+    this.usuarioLogueado =
+            usuarioLogueado;
+
+    setExtendedState(MAXIMIZED_BOTH);
+
+    cargarArticulos();
+         
     }
  private void cargarArticulos() {
 
@@ -63,6 +78,7 @@ private void limpiarCampos() {
 
     txtNombre.requestFocus();
 }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -110,6 +126,11 @@ private void limpiarCampos() {
         btnNuevo.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         btnNuevo.setForeground(new java.awt.Color(255, 255, 255));
         btnNuevo.setText("Nuevo");
+        btnNuevo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNuevoActionPerformed(evt);
+            }
+        });
 
         btnGuardar.setBackground(new java.awt.Color(0, 0, 102));
         btnGuardar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -125,21 +146,41 @@ private void limpiarCampos() {
         btnBuscar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         btnBuscar.setForeground(new java.awt.Color(255, 255, 255));
         btnBuscar.setText("Buscar");
+        btnBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarActionPerformed(evt);
+            }
+        });
 
         btnModificar.setBackground(new java.awt.Color(0, 0, 102));
         btnModificar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         btnModificar.setForeground(new java.awt.Color(255, 255, 255));
         btnModificar.setText("Modificar");
+        btnModificar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnModificarActionPerformed(evt);
+            }
+        });
 
         btnEliminar.setBackground(new java.awt.Color(0, 0, 102));
         btnEliminar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         btnEliminar.setForeground(new java.awt.Color(255, 255, 255));
         btnEliminar.setText("Eliminar");
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
 
         btnLimpiar.setBackground(new java.awt.Color(0, 0, 102));
         btnLimpiar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         btnLimpiar.setForeground(new java.awt.Color(255, 255, 255));
         btnLimpiar.setText("Limpiar");
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
 
         txtIdArticulo.setEditable(false);
 
@@ -163,6 +204,11 @@ private void limpiarCampos() {
                 "ID ", "NOMBRE", "PRECIO", "STOCK ACTUAL"
             }
         ));
+        tblArticulos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblArticulosMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblArticulos);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -313,11 +359,234 @@ if (guardado) {
         
     }//GEN-LAST:event_btnGuardarActionPerformed
 
+    private void tblArticulosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblArticulosMouseClicked
+ int fila =
+        tblArticulos.getSelectedRow();
+
+if (fila >= 0) {
+
+    txtIdArticulo.setText(
+            tblArticulos.getValueAt(
+                    fila, 0
+            ).toString()
+    );
+
+    txtNombre.setText(
+            tblArticulos.getValueAt(
+                    fila, 1
+            ).toString()
+    );
+
+    txtPrecio.setText(
+            tblArticulos.getValueAt(
+                    fila, 2
+            ).toString()
+    );
+
+    txtStockActual.setText(
+            tblArticulos.getValueAt(
+                    fila, 3
+            ).toString()
+    );
+}
+    }//GEN-LAST:event_tblArticulosMouseClicked
+
+    private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
+       Articulo articulo =
+        new Articulo();
+
+articulo.setIdArticulo(
+        Integer.parseInt(
+                txtIdArticulo.getText()
+        )
+);
+
+articulo.setNombre(
+        txtNombre.getText()
+);
+
+articulo.setPrecio(
+        Double.parseDouble(
+                txtPrecio.getText()
+        )
+);
+
+articulo.setStockActual(
+        Double.parseDouble(
+                txtStockActual.getText()
+        )
+);
+
+ArticuloDAO dao =
+        new ArticuloDAO();
+
+boolean modificado =
+        dao.modificarArticulo(
+                articulo
+        );
+
+if (modificado) {
+
+    JOptionPane.showMessageDialog(
+            this,
+            "Artículo actualizado correctamente"
+    );
+
+    cargarArticulos();
+
+    limpiarCampos();
+
+} else {
+
+    JOptionPane.showMessageDialog(
+            this,
+            "Error al actualizar artículo"
+    );
+}
+    }//GEN-LAST:event_btnModificarActionPerformed
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+       if (txtIdArticulo.getText().trim().isEmpty()) {
+
+    JOptionPane.showMessageDialog(
+            this,
+            "Seleccione un artículo"
+    );
+
+    return;
+}
+
+int opcion =
+        JOptionPane.showConfirmDialog(
+                this,
+                "¿Desea eliminar el artículo seleccionado?",
+                "Confirmación",
+                JOptionPane.YES_NO_OPTION
+        );
+
+if (opcion == JOptionPane.YES_OPTION) {
+
+    ArticuloDAO dao =
+            new ArticuloDAO();
+
+    boolean eliminado =
+            dao.eliminarArticulo(
+                    Integer.parseInt(
+                            txtIdArticulo.getText()
+                    )
+            );
+
+    if (eliminado) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Artículo eliminado correctamente"
+        );
+
+        cargarArticulos();
+
+        limpiarCampos();
+
+    } else {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Error al eliminar artículo"
+        );
+    }
+}
+    }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+      
+    buscarArticulos();
+}
+   
+     private void buscarArticulos() {
+
+    String nombre =
+            txtNombre.getText()
+                    .trim()
+                    .toLowerCase();
+
+    String precio =
+            txtPrecio.getText()
+                    .trim();
+    String stock =
+            txtStockActual.getText()
+                    .trim();
+    ArticuloDAO dao =
+            new ArticuloDAO();
+
+    List<Articulo> lista =
+            dao.listarArticulos();
+
+    DefaultTableModel modelo =
+            new DefaultTableModel();
+
+    modelo.addColumn("ID");
+    modelo.addColumn("Nombre");
+    modelo.addColumn("Precio");
+    modelo.addColumn("Stock Actual");
+
+    for (Articulo articulo : lista) {
+
+        boolean coincideNombre =
+                nombre.isEmpty()
+                || articulo.getNombre()
+                        .toLowerCase()
+                        .contains(nombre);
+
+        boolean coincidePrecio =
+                precio.isEmpty()
+                || String.valueOf(
+                        articulo.getPrecio()
+                ).contains(precio);
+         boolean coincideStock =
+                stock.isEmpty()
+                || String.valueOf(
+                        articulo.getStockActual()
+                ).contains(stock);  
+        if (coincideNombre
+                && coincidePrecio
+                && coincideStock)
+                {
+
+            modelo.addRow(
+                    new Object[]{
+                        articulo.getIdArticulo(),
+                        articulo.getNombre(),
+                        articulo.getPrecio(),
+                        articulo.getStockActual()
+                    }
+            );
+        }
+    }
+
+    tblArticulos.setModel(modelo);
+              
+    }//GEN-LAST:event_btnBuscarActionPerformed
+
     private void btnMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMenuActionPerformed
-        FrmMenuPrincipal menu = new FrmMenuPrincipal();
-        menu.setVisible(true);
-        this.dispose();
+FrmMenuPrincipal menu =
+            new FrmMenuPrincipal(
+                    usuarioLogueado
+            );
+
+    menu.setVisible(true);
+
+    this.dispose();              
     }//GEN-LAST:event_btnMenuActionPerformed
+
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+     limpiarCampos();
+     cargarArticulos();
+    }//GEN-LAST:event_btnLimpiarActionPerformed
+
+    private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
+      limpiarCampos();
+      cargarArticulos();
+    }//GEN-LAST:event_btnNuevoActionPerformed
 
     /**
      * @param args the command line arguments

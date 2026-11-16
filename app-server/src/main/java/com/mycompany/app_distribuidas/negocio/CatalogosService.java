@@ -19,8 +19,19 @@ public class CatalogosService {
             case "articulo"->new Tabla("ARTICULO","ID_ARTICULO",new String[]{
                 "NOMBRE","PRECIO","STOCK_ACTUAL"
             },"SEQ_ARTICULO");
+            case "tipoMovimiento" -> new Tabla(
+        "TIPO_MOVIMIENTO",
+        "ID_TIPO_MOV",
+        new String[]{
+            "DESCRIPCION",
+            "SIGNO"
+        },
+        "SEQ_TIPO_MOV"
+);    
+                
             default->throw new AppException("UNKNOWN_ACTION","Catálogo desconocido");
         };
+        
     }
     private String key(String col){
         return switch(col){
@@ -30,6 +41,12 @@ public class CatalogosService {
             case "ADIRECCION"->"direccion";
             case "NOMBRE_CIUDAD","NOMBRE_CIUDAD_"->"nombreCiudad";
             case "STOCK_ACTUAL"->"stockActual";
+            case "ID_TIPO_MOV" ->
+        "idTipoMovimiento";
+
+case "DESCRIPCION" ->
+        "descripcion";
+    
             default->col.toLowerCase();
         };
     }
@@ -89,8 +106,30 @@ public class CatalogosService {
                     if(op.equals("crear"))s.setLong(index++,id);
                     for(String col:t.cols){
                         String k=key(col);
-                        if(col.equals("PRECIO")||col.equals("STOCK_ACTUAL"))s.setBigDecimal(index++,p.get(k).getAsBigDecimal());
-                        else s.setString(index++,p.get(k).getAsString());
+                    if(col.equals("PRECIO")
+        || col.equals("STOCK_ACTUAL")) {
+
+    s.setBigDecimal(
+            index++,
+            p.get(k).getAsBigDecimal()
+    );
+
+}
+else if(col.equals("SIGNO")) {
+
+    s.setInt(
+            index++,
+            p.get(k).getAsInt()
+    );
+
+}
+else {
+
+    s.setString(
+            index++,
+            p.get(k).getAsString()
+    );
+}   
                     }if(op.equals("actualizar"))s.setLong(index,id);
                     int count=s.executeUpdate();
                     if(count==0)throw new AppException("NOT_FOUND","Registro no encontrado");

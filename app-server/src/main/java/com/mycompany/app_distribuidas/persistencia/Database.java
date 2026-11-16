@@ -15,7 +15,7 @@ public final class Database {
     public static long next(Connection c, String sequence) throws SQLException {
         String sql = switch (sequence) {
             case "SEQ_CLIENTE", "SEQ_FACTURA", "SEQ_MOVIMIENTO", "SEQ_ARTICULO",
-                 "SEQ_USUARIO", "SEQ_TIPO_TRANSACCION", "SEQ_TRANSACCION", "SEQ_COBRO" ->
+                 "SEQ_USUARIO", "SEQ_TIPO_TRANSACCION", "SEQ_TRANSACCION", "SEQ_COBRO", "SEQ_TIPO_MOV" ->
                 "SELECT " + sequence + ".NEXTVAL FROM DUAL";
             case "SEQ_CIUDAD" -> "SELECT NVL(MAX(ID_CIUDAD), 0) + 1 FROM CIUDAD_ENTREGA";
             case "SEQ_DETALLE_FAC" -> "SELECT NVL(MAX(ID_DETALLE_FAC), 0) + 1 FROM DETALLE_FACTURA";
