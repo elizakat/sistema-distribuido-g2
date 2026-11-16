@@ -191,10 +191,12 @@ public class FrmTipoTransaccion extends JFrame {
             model.setRowCount(0);
             for (JsonElement e : a) {
                 JsonObject x = e.getAsJsonObject();
+                String nom = (!x.has("nombre") || x.get("nombre").isJsonNull()) ? "" : x.get("nombre").getAsString();
+                String sig = (!x.has("signo") || x.get("signo").isJsonNull()) ? "+" : x.get("signo").getAsString();
                 model.addRow(new Object[]{
                     x.get("idTipoTransaccion").getAsInt(),
-                    x.get("nombre").getAsString(),
-                    x.get("signo").getAsString()
+                    nom,
+                    sig
                 });
             }
         } catch (Exception ex) { }

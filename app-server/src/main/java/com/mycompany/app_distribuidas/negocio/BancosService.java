@@ -14,7 +14,7 @@ import java.util.List;
 
 public class BancosService {
 
-    private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+    private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").serializeNulls().create();
 
     // Recibe el JSON del Router, lo convierte a objetos Java y llama al metodo correcto
     public Object ejecutar(String recurso, String operacion, JsonObject payload) throws AppException {
@@ -48,6 +48,9 @@ public class BancosService {
             else if (recurso.equals("tipotransaccion")) {
                 if (operacion.equals("insertar")) {
                     TipoTransaccion tipo = gson.fromJson(payload, TipoTransaccion.class);
+                    if (tipo.getNombre() == null || tipo.getNombre().trim().isEmpty()) {
+                        throw new AppException("INVALID_DATA", "El nombre del tipo de transacción es obligatorio.");
+                    }
                     BancosDAO.insertarTipoTransaccion(tipo);
                     return "Tipo de transacción registrado";
                 } else if (operacion.equals("listar")) {
@@ -56,6 +59,9 @@ public class BancosService {
                     return respuesta;
                 } else if (operacion.equals("actualizar")) {
                     TipoTransaccion tipo = gson.fromJson(payload, TipoTransaccion.class);
+                    if (tipo.getNombre() == null || tipo.getNombre().trim().isEmpty()) {
+                        throw new AppException("INVALID_DATA", "El nombre del tipo de transacción es obligatorio.");
+                    }
                     BancosDAO.actualizarTipoTransaccion(tipo);
                     return "Tipo de transacción actualizado";
                 } else if (operacion.equals("eliminar")) {

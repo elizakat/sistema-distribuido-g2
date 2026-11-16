@@ -174,7 +174,9 @@ public class FrmTransaccion extends JFrame {
             for (JsonElement e : cuentas) {
                 JsonObject obj = e.getAsJsonObject();
                 int id = obj.get("numeroCuenta").getAsInt();
-                String texto = id + " - " + obj.get("cliente").getAsString() + " (" + obj.get("descripcion").getAsString() + ")";
+                String cli = (!obj.has("cliente") || obj.get("cliente").isJsonNull()) ? "" : obj.get("cliente").getAsString();
+                String desc = (!obj.has("descripcion") || obj.get("descripcion").isJsonNull()) ? "" : obj.get("descripcion").getAsString();
+                String texto = id + " - " + cli + " (" + desc + ")";
                 mapaCuentas.put(texto, id);
                 cmbCuenta.addItem(texto);
             }
@@ -186,7 +188,9 @@ public class FrmTransaccion extends JFrame {
             for (JsonElement e : tipos) {
                 JsonObject obj = e.getAsJsonObject();
                 int id = obj.get("idTipoTransaccion").getAsInt();
-                String texto = obj.get("nombre").getAsString() + " (" + obj.get("signo").getAsString() + ")";
+                String nom = (!obj.has("nombre") || obj.get("nombre").isJsonNull()) ? "" : obj.get("nombre").getAsString();
+                String sig = (!obj.has("signo") || obj.get("signo").isJsonNull()) ? "+" : obj.get("signo").getAsString();
+                String texto = nom + " (" + sig + ")";
                 mapaTipos.put(texto, id);
                 mapaNombresTipos.put(id, texto);
                 cmbTipoTransaccion.addItem(texto);
@@ -201,11 +205,12 @@ public class FrmTransaccion extends JFrame {
             modeloCabeceras.setRowCount(0);
             for (JsonElement e : arr) {
                 JsonObject x = e.getAsJsonObject();
+                String desc = (!x.has("descripcion") || x.get("descripcion").isJsonNull()) ? "" : x.get("descripcion").getAsString();
                 modeloCabeceras.addRow(new Object[]{
                     x.get("idTransaccion").getAsInt(),
                     x.get("fecha").getAsString(),
                     x.get("numeroCuenta").getAsInt(),
-                    x.get("descripcion").isJsonNull() ? "" : x.get("descripcion").getAsString()
+                    desc
                 });
             }
         } catch (Exception ex) { }
@@ -376,7 +381,7 @@ public class FrmTransaccion extends JFrame {
         String q = JOptionPane.showInputDialog(this, "Buscar transacción por código o descripción:");
         if (q != null) {
             for (int i = 0; i < modeloCabeceras.getRowCount(); i++) {
-                String texto = modeloCabeceras.getValueAt(i, 0).toString() + " " + modeloCabeceras.getValueAt(i, 3).toString();
+                String texto = modeloCabeceras.getValueAt(i, 0).toString() + " " + modeloCabeceras.getValueAt(i, 2).toString() + " " + modeloCabeceras.getValueAt(i, 3).toString();
                 if (texto.toLowerCase().contains(q.toLowerCase())) {
                     tablaCabeceras.setRowSelectionInterval(i, i);
                     tablaCabeceras.scrollRectToVisible(tablaCabeceras.getCellRect(i, 0, true));

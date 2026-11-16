@@ -146,6 +146,11 @@ private void limpiarCampos() {
         btnMenu.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         btnMenu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/mycompany/app_distribuidas/img/home-button.png"))); // NOI18N
         btnMenu.setText("Menú Principal");
+        btnMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMenuActionPerformed(evt);
+            }
+        });
 
         tblArticulos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -307,6 +312,12 @@ if (guardado) {
 }
         
     }//GEN-LAST:event_btnGuardarActionPerformed
+
+    private void btnMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMenuActionPerformed
+        FrmMenuPrincipal menu = new FrmMenuPrincipal();
+        menu.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnMenuActionPerformed
 
     /**
      * @param args the command line arguments

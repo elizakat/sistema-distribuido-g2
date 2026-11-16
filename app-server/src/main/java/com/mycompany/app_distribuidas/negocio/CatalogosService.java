@@ -11,10 +11,10 @@ public class CatalogosService {
     private Tabla tabla(String tipo){
         return switch(tipo){
             case "cliente"->new Tabla("CLIENTE","ID_CLIENTE",new String[]{
-                "RUC","NOMBRE","DIRECCION"
+                "RUC","NOMBRE","ADIRECCION"
             },"SEQ_CLIENTE");
             case "ciudad"->new Tabla("CIUDAD_ENTREGA","ID_CIUDAD",new String[]{
-                "NOMBRE_CIUDAD"
+                "NOMBRE_CIUDAD_"
             },"SEQ_CIUDAD");
             case "articulo"->new Tabla("ARTICULO","ID_ARTICULO",new String[]{
                 "NOMBRE","PRECIO","STOCK_ACTUAL"
@@ -27,7 +27,8 @@ public class CatalogosService {
             case "ID_CLIENTE"->"idCliente";
             case "ID_CIUDAD"->"idCiudad";
             case "ID_ARTICULO"->"idArticulo";
-            case "NOMBRE_CIUDAD"->"nombreCiudad";
+            case "ADIRECCION"->"direccion";
+            case "NOMBRE_CIUDAD","NOMBRE_CIUDAD_"->"nombreCiudad";
             case "STOCK_ACTUAL"->"stockActual";
             default->col.toLowerCase();
         };

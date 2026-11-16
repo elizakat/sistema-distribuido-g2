@@ -206,10 +206,12 @@ public class FrmCuentaBancaria extends JFrame {
             model.setRowCount(0);
             for (JsonElement e : a) {
                 JsonObject x = e.getAsJsonObject();
+                String cli = (!x.has("cliente") || x.get("cliente").isJsonNull()) ? "" : x.get("cliente").getAsString();
+                String desc = (!x.has("descripcion") || x.get("descripcion").isJsonNull()) ? "" : x.get("descripcion").getAsString();
                 model.addRow(new Object[]{
                     x.get("numeroCuenta").getAsInt(),
-                    x.get("cliente").getAsString(),
-                    x.get("descripcion").isJsonNull() ? "" : x.get("descripcion").getAsString()
+                    cli,
+                    desc
                 });
             }
         } catch (Exception ex) { }
@@ -239,10 +241,11 @@ public class FrmCuentaBancaria extends JFrame {
                     }
                 }
                 case "Buscar" -> {
-                    String q = JOptionPane.showInputDialog(this, "Buscar por número de cuenta o cliente");
+                    String q = JOptionPane.showInputDialog(this, "Buscar por número de cuenta, cliente o descripción");
                     if (q != null) {
                         for (int i = 0; i < model.getRowCount(); i++) {
-                            if ((model.getValueAt(i, 0).toString() + model.getValueAt(i, 1)).toLowerCase().contains(q.toLowerCase())) {
+                            String fila = model.getValueAt(i, 0).toString() + " " + model.getValueAt(i, 1) + " " + model.getValueAt(i, 2);
+                            if (fila.toLowerCase().contains(q.toLowerCase())) {
                                 tabla.setRowSelectionInterval(i, i);
                                 tabla.scrollRectToVisible(tabla.getCellRect(i, 0, true));
                                 break;

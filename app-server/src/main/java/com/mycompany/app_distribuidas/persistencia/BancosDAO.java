@@ -9,17 +9,19 @@ import com.mycompany.app_distribuidas.modelo.TipoTransaccion;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class BancosDAO {
 
     // Guarda una nueva cuenta bancaria en Oracle otorgando un numero de cuenta real de 10 digitos
     public static void insertarCuenta(CuentaBancaria cuenta) throws SQLException {
-        String sql = "INSERT INTO CUENTA_BANCARIA (ID_CUENTA, NUMERO_CUENTA, BANCO, DESCRIPCION) "
-                   + "VALUES ((SELECT GREATEST(NVL(MAX(ID_CUENTA), 0) + 1, 2100100001) FROM CUENTA_BANCARIA), "
-                   + "(SELECT TO_CHAR(GREATEST(NVL(MAX(ID_CUENTA), 0) + 1, 2100100001)) FROM CUENTA_BANCARIA), ?, ?)";
+        String sql = "INSERT INTO CUENTA_BANCARIA (ID_CUENTA, NUMERO_CUENTA, BANCO, DESCRIPCION) VALUES (?, ?, ?, ?)";
         try (Connection c = Database.abrir(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, cuenta.getCliente());
-            ps.setString(2, cuenta.getDescripcion());
+            long id = Database.next(c, "SEQ_CUENTA");
+            ps.setLong(1, id);
+            ps.setString(2, String.valueOf(id));
+            ps.setString(3, cuenta.getCliente());
+            ps.setString(4, Objects.toString(cuenta.getDescripcion(), ""));
             ps.executeUpdate();
         }
     }
@@ -30,7 +32,11 @@ public class BancosDAO {
         try (Connection c = Database.abrir(); Statement st = c.createStatement();
              ResultSet rs = st.executeQuery("SELECT ID_CUENTA, BANCO, DESCRIPCION FROM CUENTA_BANCARIA ORDER BY ID_CUENTA")) {
             while (rs.next()) {
-                lista.add(new CuentaBancaria(rs.getInt(1), rs.getString(2), rs.getString(3)));
+                lista.add(new CuentaBancaria(
+                    rs.getInt(1),
+                    Objects.toString(rs.getString(2), ""),
+                    Objects.toString(rs.getString(3), "")
+                ));
             }
         }
         return lista;
@@ -61,11 +67,24 @@ public class BancosDAO {
         }
     }
 
-    // Elimina una cuenta bancaria por su ID
+    // Elimina una cuenta bancaria y sus transacciones asociadas por su ID
     public static void eliminarCuenta(int idCuenta) throws SQLException {
-        try (Connection c = Database.abrir(); PreparedStatement ps = c.prepareStatement("DELETE FROM CUENTA_BANCARIA WHERE ID_CUENTA=?")) {
-            ps.setInt(1, idCuenta);
-            ps.executeUpdate();
+        try (Connection c = Database.abrir()) {
+            c.setAutoCommit(false);
+            try (PreparedStatement psDet = c.prepareStatement("DELETE FROM DETALLE_TRANSACCION WHERE ID_TRANSACCION IN (SELECT ID_TRANSACCION FROM TRANSACCION_BANCARIA WHERE ID_CUENTA=?)");
+                 PreparedStatement psCab = c.prepareStatement("DELETE FROM TRANSACCION_BANCARIA WHERE ID_CUENTA=?");
+                 PreparedStatement psCta = c.prepareStatement("DELETE FROM CUENTA_BANCARIA WHERE ID_CUENTA=?")) {
+                psDet.setInt(1, idCuenta);
+                psDet.executeUpdate();
+                psCab.setInt(1, idCuenta);
+                psCab.executeUpdate();
+                psCta.setInt(1, idCuenta);
+                psCta.executeUpdate();
+                c.commit();
+            } catch (SQLException e) {
+                c.rollback();
+                throw e;
+            }
         }
     }
 
@@ -86,7 +105,11 @@ public class BancosDAO {
         try (Connection c = Database.abrir(); Statement st = c.createStatement();
              ResultSet rs = st.executeQuery("SELECT ID_TIPO_TRANS, NOMBRE_TRANS, NATURALEZA FROM TIPO_TRANSACCION ORDER BY TO_NUMBER(ID_TIPO_TRANS)")) {
             while (rs.next()) {
-                lista.add(new TipoTransaccion(rs.getInt(1), rs.getString(2), "C".equals(rs.getString(3)) ? "+" : "-"));
+                lista.add(new TipoTransaccion(
+                    rs.getInt(1),
+                    Objects.toString(rs.getString(2), ""),
+                    "C".equals(rs.getString(3)) ? "+" : "-"
+                ));
             }
         }
         return lista;
@@ -102,11 +125,21 @@ public class BancosDAO {
         }
     }
 
-    // Elimina un tipo de transaccion por su codigo
+    // Elimina un tipo de transaccion y sus detalles asociados por su codigo
     public static void eliminarTipoTransaccion(int idTipo) throws SQLException {
-        try (Connection c = Database.abrir(); PreparedStatement ps = c.prepareStatement("DELETE FROM TIPO_TRANSACCION WHERE ID_TIPO_TRANS=?")) {
-            ps.setString(1, String.valueOf(idTipo));
-            ps.executeUpdate();
+        try (Connection c = Database.abrir()) {
+            c.setAutoCommit(false);
+            try (PreparedStatement psDet = c.prepareStatement("DELETE FROM DETALLE_TRANSACCION WHERE ID_TIPO_TRANS=?");
+                 PreparedStatement psTipo = c.prepareStatement("DELETE FROM TIPO_TRANSACCION WHERE ID_TIPO_TRANS=?")) {
+                psDet.setString(1, String.valueOf(idTipo));
+                psDet.executeUpdate();
+                psTipo.setString(1, String.valueOf(idTipo));
+                psTipo.executeUpdate();
+                c.commit();
+            } catch (SQLException e) {
+                c.rollback();
+                throw e;
+            }
         }
     }
 
@@ -186,7 +219,14 @@ public class BancosDAO {
         List<CabeceraTransaccion> lista = new ArrayList<>();
         try (Connection c = Database.abrir(); Statement st = c.createStatement();
              ResultSet rs = st.executeQuery("SELECT ID_TRANSACCION, FECHA_REGISTRO, ID_CUENTA, REFERENCIA FROM TRANSACCION_BANCARIA ORDER BY ID_TRANSACCION DESC")) {
-            while (rs.next()) lista.add(new CabeceraTransaccion(rs.getInt(1), rs.getDate(2), rs.getInt(3), rs.getString(4)));
+            while (rs.next()) {
+                lista.add(new CabeceraTransaccion(
+                    rs.getInt(1),
+                    rs.getDate(2),
+                    rs.getInt(3),
+                    Objects.toString(rs.getString(4), "")
+                ));
+            }
         }
         return lista;
     }

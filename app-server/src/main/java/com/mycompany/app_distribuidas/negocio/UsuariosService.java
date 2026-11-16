@@ -10,7 +10,12 @@ public class UsuariosService {
         x.addProperty("idUsuario",r.getInt("ID_USUARIO"));
         x.addProperty("username",r.getString("USERNAME"));
         x.addProperty("estado",r.getString("ESTADO"));
-        x.addProperty("tipoUsuario", "ADMIN");
+        String tipo = "U";
+        try {
+            tipo = r.getString("TIPO_USUARIO");
+            if (tipo == null || tipo.isBlank()) tipo = "U";
+        } catch (SQLException ignored) {}
+        x.addProperty("tipoUsuario", tipo.trim());
         return x;
     }
     public Object ejecutar(String op,JsonObject p)throws SQLException{
@@ -45,21 +50,35 @@ public class UsuariosService {
             }
             if(op.equals("crear")){
                 long id=Database.next(c,"SEQ_USUARIO");
+                String tipo = "U";
+                if(p.has("tipoUsuario") && !p.get("tipoUsuario").isJsonNull()){
+                    String t = Mensajes.str(p,"tipoUsuario");
+                    tipo = (t != null && t.toUpperCase().startsWith("A")) ? "A" : "U";
+                }
                 try(PreparedStatement s=c.prepareStatement("INSERT INTO USUARIO(ID_USUARIO,USERNAME,CLAVE,ESTADO,TIPO_USUARIO) VALUES(?,?,?,?,?)")){
                     s.setLong(1,id);
                     s.setString(2,Mensajes.str(p,"username"));
                     s.setString(3,Mensajes.str(p,"clave"));
                     s.setString(4,p.has("estado")?Mensajes.str(p,"estado"):"A");
-                    s.setString(5,Mensajes.str(p,"tipoUsuario"));
+                    s.setString(5,tipo);
                     s.executeUpdate();
                 }return Map.of("idUsuario",id);
             }
             if(op.equals("actualizar")){
-                try(PreparedStatement s=c.prepareStatement("UPDATE USUARIO SET USERNAME=?,ESTADO=?,TIPO_USUARIO=? "+(p.has("clave")&&!Mensajes.str(p,"clave").isBlank()?",CLAVE=?":"")+" WHERE ID_USUARIO=?")){
-                    s.setString(1,Mensajes.str(p,"username"));
-                    s.setString(2,Mensajes.str(p,"estado"));
-                    s.setString(3,Mensajes.str(p,"tipoUsuario"));
-                    int index=4;
+                String tipo = null;
+                if(p.has("tipoUsuario") && !p.get("tipoUsuario").isJsonNull()){
+                    String t = Mensajes.str(p,"tipoUsuario");
+                    tipo = (t != null && t.toUpperCase().startsWith("A")) ? "A" : "U";
+                }
+                String sql = "UPDATE USUARIO SET USERNAME=?,ESTADO=?"
+                        + (tipo != null ? ",TIPO_USUARIO=?" : "")
+                        + (p.has("clave")&&!Mensajes.str(p,"clave").isBlank()?",CLAVE=?":"")
+                        + " WHERE ID_USUARIO=?";
+                try(PreparedStatement s=c.prepareStatement(sql)){
+                    int index = 1;
+                    s.setString(index++,Mensajes.str(p,"username"));
+                    s.setString(index++,Mensajes.str(p,"estado"));
+                    if(tipo != null) s.setString(index++, tipo);
                     if(p.has("clave")&&!Mensajes.str(p,"clave").isBlank())s.setString(index++,Mensajes.str(p,"clave"));
                     s.setInt(index,p.get("idUsuario").getAsInt());
                     if(s.executeUpdate()==0)throw new AppException("NOT_FOUND","Usuario no encontrado");

@@ -13,13 +13,19 @@ public final class Database {
     }
 
     public static long next(Connection c, String sequence) throws SQLException {
-        try (PreparedStatement ps = c.prepareStatement("SELECT " + switch (sequence) {
-            case "SEQ_CLIENTE", "SEQ_CIUDAD", "SEQ_FACTURA", "SEQ_DETALLE_FAC",
-                 "SEQ_MOVIMIENTO", "SEQ_DETALLE_MOV", "SEQ_ARTICULO", "SEQ_USUARIO",
-                 "SEQ_CUENTA", "SEQ_TIPO_TRANSACCION", "SEQ_TIPO_TRANS", "SEQ_TRANSACCION", "SEQ_DETALLE_TRANS",
-                 "SEQ_COBRO", "SEQ_DETALLE_COBRO" -> sequence;
+        String sql = switch (sequence) {
+            case "SEQ_CLIENTE", "SEQ_FACTURA", "SEQ_MOVIMIENTO", "SEQ_ARTICULO",
+                 "SEQ_USUARIO", "SEQ_TIPO_TRANSACCION", "SEQ_TRANSACCION", "SEQ_COBRO" ->
+                "SELECT " + sequence + ".NEXTVAL FROM DUAL";
+            case "SEQ_CIUDAD" -> "SELECT NVL(MAX(ID_CIUDAD), 0) + 1 FROM CIUDAD_ENTREGA";
+            case "SEQ_DETALLE_FAC" -> "SELECT NVL(MAX(ID_DETALLE_FAC), 0) + 1 FROM DETALLE_FACTURA";
+            case "SEQ_DETALLE_MOV" -> "SELECT NVL(MAX(ID_DETALLE_MOV), 0) + 1 FROM DETALLE_MOVIMIENTO";
+            case "SEQ_CUENTA" -> "SELECT GREATEST(NVL(MAX(ID_CUENTA), 0) + 1, 2100100001) FROM CUENTA_BANCARIA";
+            case "SEQ_DETALLE_TRANS" -> "SELECT NVL(MAX(ID_DETALLE_TRANS), 0) + 1 FROM DETALLE_TRANSACCION";
+            case "SEQ_DETALLE_COBRO" -> "SELECT NVL(MAX(ID_DETALLE_COBRO), 0) + 1 FROM DETALLE_COBRO";
             default -> throw new IllegalArgumentException("Secuencia inválida: " + sequence);
-        } + ".NEXTVAL FROM DUAL");
+        };
+        try (PreparedStatement ps = c.prepareStatement(sql);
              ResultSet r = ps.executeQuery()) {
             r.next();
             return r.getLong(1);
